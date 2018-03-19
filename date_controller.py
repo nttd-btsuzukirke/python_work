@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-#! python3
-
+# coding: utf-8
 import datetime
-from dateutil.relativedelta import relativedelta, MO
+from dateutil.relativedelta import relativedelta
 import calendar
+import jholiday
+import datetime
+
 
 
 """
@@ -42,16 +44,18 @@ for i in range(first.day, last.day+1, 1):
     0: 月, 1: 火, 2: 水, 3: 木, 4: 金, 5: 土, 6: 日
     """
 
-    if iter_date.weekday() == 0:
-        print(str(iter_date) + ' is Monday')
-    elif iter_date.weekday() == 1:
-        print(str(iter_date) + ' is Tuesday')
-    elif iter_date.weekday() == 2:
-        print(str(iter_date) + ' is Wednesday')
-    elif iter_date.weekday() == 3:
-        print(str(iter_date) + ' is Thursday')
-    elif iter_date.weekday() == 4:
-        print(str(iter_date) + ' is Friday')
+    holiday_name = jholiday.holiday_name(date=iter_date)
 
+    if holiday_name is None:
 
-
+        if iter_date.weekday() == 0:
+            print(str(iter_date) + ' is Monday')
+        elif iter_date.weekday() == 1:
+            print(str(iter_date) + ' is Tuesday')
+        elif iter_date.weekday() == 2:
+            print(str(iter_date) + ' is Wednesday')
+        elif iter_date.weekday() == 3:
+            print(str(iter_date) + ' is Thursday')
+        elif iter_date.weekday() == 4:
+            print(str(iter_date) + ' is Friday')
+            
