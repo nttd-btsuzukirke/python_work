@@ -1,11 +1,15 @@
 #! python3
 
 from selenium import webdriver
+import selenium
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import UnexpectedAlertPresentException
+from selenium.common.exceptions import NoAlertPresentException
+
 import time
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -19,9 +23,9 @@ url='https://gg2.groupwide.net/iMRRoomBooking/'
 driver.get(url)
 
 #ログイン情報記入
-login_id = ''
-com_id = ''
-password = ''
+login_id = 'u621625'
+com_id = 'nttdata'
+password = 'zipzinger29'
 
 """
 LOGIN
@@ -64,126 +68,332 @@ def get_dates():
 
 first, last = get_dates()
 
+def my_mtg():
 
-for i in range(first.day, last.day+1, 1): # 月の初めから最後までループ
+    """"
+    個人用の予約
 
-    iter_date = today + relativedelta(months=target_month) - datetime.timedelta(days=get_month.day - i) # iが増えることで日も増える
-    """
-    datetimeから曜日を取得
-    weekdayと曜日の対応     
-    0: 月, 1: 火, 2: 水, 3: 木, 4: 金, 5: 土, 6: 日
-    """
-    """
-    属性の値　data-timeline = "x" ←　以下から該当する数字をxに記入する
-
-    1: 応接室,　2: 大会議室,　3: SouthTerrace,　4: Core-A　6: 事業部長会議室　
-    7: N-A,　8: N-B, 9: N-C, 10: N-D, 11:N-E, 12: N-F 
-    13: S-A,　14: S-B, 15: S-C, 16: S-D, 17: S-E
     """
 
-    if iter_date.weekday() == 1: #火曜日だったら以下を予約
+    for d in range(first.day, last.day+1, 1): # 月の初めから最後までループ
+
+        iter_date = today + relativedelta(months=target_month) - datetime.timedelta(days=get_month.day - d) # iが増えることで日も増える
         """
-                     大会議室　火曜　11:00-12:00を予約
-
+        datetimeから曜日を取得
+        weekdayと曜日の対応     
+        0: 月, 1: 火, 2: 水, 3: 木, 4: 金, 5: 土, 6: 日
         """
-        start_time = '11:00'
-        end_time = '12:00'
-        day_name = '(火)'
-        driver.find_element_by_link_text(str(i)).click()  # 日付指定
-        driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="2"]').click()  # 二行目(大会議室)を選択
-        # 時間選択
-        start_time_element = driver.find_element_by_name('StartTime')
-        select_start_time = Select(start_time_element)
-        select_start_time.select_by_value(start_time)
-        end_time_element = driver.find_element_by_name('EndTime')
-        select_end_time = Select(end_time_element)
-        select_end_time.select_by_value(end_time)
-        # 目的選択
-        purpose = driver.find_element_by_name('PurposeCode')
-        select_purpose = Select(purpose)
-        select_purpose.select_by_value('1')
-        driver.find_element_by_name("NumberOfUsers").send_keys('10')
-        # 予約ボタン押下
-        driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
-
-        #except NoSuchElementException:
-        #    print("属性が見つかりませんでした。")
-
-        #ダブルブッキングした場合
-        alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
-        if alert_msg:
-            print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
-            driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
-
-
         """
-                    大会議室　火曜　14:00-15:00を予約
+        属性の値　data-timeline = "x" ←　以下から該当する数字をxに記入する
+    
+        1: 応接室,　2: 大会議室,　3: SouthTerrace,　4: Core-A　6: 事業部長会議室　
+        7: N-A,　8: N-B, 9: N-C, 10: N-D, 11:N-E, 12: N-F 
+        13: S-A,　14: S-B, 15: S-C, 16: S-D, 17: S-E
         """
-        start_time = '14:00'
-        end_time = '15:00'
-      
-        driver.find_element_by_link_text(str(i)).click()  # 日付指定
-        driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="12"]').click()  # N-Fを選択
-        start_time_element = driver.find_element_by_name('StartTime')
-        select_start_time = Select(start_time_element)
-        select_start_time.select_by_value(start_time)
-        end_time_element = driver.find_element_by_name('EndTime')
-        select_end_time = Select(end_time_element)
-        select_end_time.select_by_value(end_time)
 
-        #目的選択
-        purpose = driver.find_element_by_name('PurposeCode')
-        select_purpose = Select(purpose)
-        select_purpose.select_by_value('1')
+        if iter_date.weekday() == 1: #火曜日だったら以下を予約
+            """
+                         大会議室　火曜　11:00-12:00を予約
+    
+            """
+            start_time = '11:00'
+            end_time = '12:00'
+            day_name = '(火)'
+            driver.find_element_by_link_text(str(i)).click()  # 日付指定
+            driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="2"]').click()  # 二行目(大会議室)を選択
+            # 時間選択
+            start_time_element = driver.find_element_by_name('StartTime')
+            select_start_time = Select(start_time_element)
+            select_start_time.select_by_value(start_time)
+            end_time_element = driver.find_element_by_name('EndTime')
+            select_end_time = Select(end_time_element)
+            select_end_time.select_by_value(end_time)
+            # 目的選択
+            purpose = driver.find_element_by_name('PurposeCode')
+            select_purpose = Select(purpose)
+            select_purpose.select_by_value('1')
+            driver.find_element_by_name("NumberOfUsers").send_keys('10')
+            # 予約ボタン押下
+            driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
 
-        driver.find_element_by_name("NumberOfUsers").send_keys('10')
-        #driver.find_element_by_class_name("btnbluesubmit-form-new").click()
-        # 予約ボタン押下
-        driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+            #except NoSuchElementException:
+            #    print("属性が見つかりませんでした。")
 
-        # ダブルブッキングした場合
-        if alert_msg:
-            print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
-            driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+            #ダブルブッキングした場合
+            alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
 
 
-    elif iter_date.weekday() == 4: # 木曜だったら以下を予約
+            """
+                        大会議室　火曜　14:00-15:00を予約
+            """
+            start_time = '14:00'
+            end_time = '15:00'
+
+            driver.find_element_by_link_text(str(i)).click()  # 日付指定
+            driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="12"]').click()  # N-Fを選択
+            start_time_element = driver.find_element_by_name('StartTime')
+            select_start_time = Select(start_time_element)
+            select_start_time.select_by_value(start_time)
+            end_time_element = driver.find_element_by_name('EndTime')
+            select_end_time = Select(end_time_element)
+            select_end_time.select_by_value(end_time)
+
+            #目的選択
+            purpose = driver.find_element_by_name('PurposeCode')
+            select_purpose = Select(purpose)
+            select_purpose.select_by_value('1')
+
+            driver.find_element_by_name("NumberOfUsers").send_keys('10')
+            #driver.find_element_by_class_name("btnbluesubmit-form-new").click()
+            # 予約ボタン押下
+            driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+
+            # ダブルブッキングした場合
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+
+
+        elif iter_date.weekday() == 3: # 木曜だったら以下を予約
+            """
+                        South Terrace 木曜　16:00-18:00を予約
+            """
+            start_time = '16:00'
+            end_time = '18:00'
+            day_name = '(木)'
+
+            try:
+                driver.find_element_by_link_text(str(i)).click()  # 日付指定
+                driver.implicitly_wait(10)  # 見つからないときは、10秒まで待つ
+                driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="3"]').click()  # STを選択
+
+                # 時間選択
+                start_time_element = driver.find_element_by_name('StartTime')
+                select_start_time = Select(start_time_element)
+                select_start_time.select_by_value(start_time)
+                end_time_element = driver.find_element_by_name('EndTime')
+                select_end_time = Select(end_time_element)
+                select_end_time.select_by_value(end_time)
+                # 目的選択
+                purpose = driver.find_element_by_name('PurposeCode')
+                select_purpose = Select(purpose)
+                select_purpose.select_by_value('1')
+                driver.find_element_by_name("NumberOfUsers").send_keys('10')
+                # 予約ボタン押下
+                driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+
+            except selenium.common.exceptions.UnexpectedAlertPresentException:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
+                    end_time) + ' is holiday.')
+
+            # ダブルブッキングした場合
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+
+
+def oms_mtg():
+
+    """"
+    試験朝会用の予約
+
+    """
+
+
+    for d in range(first.day, last.day + 1, 1):  # 月の初めから最後までループ
+
+        iter_date = today + relativedelta(months=target_month) - datetime.timedelta(
+            days=get_month.day - d)  # iが増えることで日も増える
         """
-                    South Terrace 木曜　16:00-18:00を予約
+        datetimeから曜日を取得
+        weekdayと曜日の対応     
+        0: 月, 1: 火, 2: 水, 3: 木, 4: 金, 5: 土, 6: 日
         """
-        start_time = '16:00'
-        end_time = '18:00'
-        day_name = '(木)'
-        driver.find_element_by_link_text(str(i)).click()  # 日付指定
-        driver.implicitly_wait(10)  # 見つからないときは、10秒まで待つ
-        driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="3"]').click()  # STを選択
+        """
+        属性の値　data-timeline = "x" ←　以下から該当する数字をxに記入する
 
-        # 時間選択
-        start_time_element = driver.find_element_by_name('StartTime')
-        select_start_time = Select(start_time_element)
-        select_start_time.select_by_value(start_time)
-        end_time_element = driver.find_element_by_name('EndTime')
-        select_end_time = Select(end_time_element)
-        select_end_time.select_by_value(end_time)
-        # 目的選択
-        purpose = driver.find_element_by_name('PurposeCode')
-        select_purpose = Select(purpose)
-        select_purpose.select_by_value('1')
-        driver.find_element_by_name("NumberOfUsers").send_keys('10')
-        # 予約ボタン押下
-        driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+        1: 応接室,　2: 大会議室,　3: SouthTerrace,　4: Core-A　6: 事業部長会議室　
+        7: N-A,　8: N-B, 9: N-C, 10: N-D, 11:N-E, 12: N-F 
+        13: S-A,　14: S-B, 15: S-C, 16: S-D, 17: S-E
+        """
 
-        # ダブルブッキングした場合
-        if alert_msg:
-            print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
-            driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+        if iter_date.weekday() == 0:  # 月曜日だったら以下を予約
+            """
+                         N-E　月曜　9:30-11:00を予約
+
+            """
+            start_time = '9:30'  # ここを変える
+            end_time = '11:00'  # ここを変える
+            day_name = '(月)'
+            driver.find_element_by_link_text(str(i)).click()  # 日付指定
+            driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="11"]').click()  # N-Eを選択 ここを変える
+            # 時間選択
+            start_time_element = driver.find_element_by_name('StartTime')
+            select_start_time = Select(start_time_element)
+            select_start_time.select_by_value(start_time)
+            end_time_element = driver.find_element_by_name('EndTime')
+            select_end_time = Select(end_time_element)
+            select_end_time.select_by_value(end_time)
+            # 目的選択
+            purpose = driver.find_element_by_name('PurposeCode')
+            select_purpose = Select(purpose)
+            select_purpose.select_by_value('1')
+            driver.find_element_by_name("NumberOfUsers").send_keys('10')
+            # 予約ボタン押下
+            driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+
+            # except NoSuchElementException:
+            #    print("属性が見つかりませんでした。")
+
+            # ダブルブッキングした場合
+            alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
+                    end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+
+        elif iter_date.weekday() == 1:  # 火曜日だったら以下を予約
+            """
+                         N-E　火曜　9:30-10:30を予約
+    
+            """
+            start_time = '9:30'  # ここを変える
+            end_time = '11:00'  # ここを変える
+            day_name = '(火)'
+            driver.find_element_by_link_text(str(i)).click()  # 日付指定
+            driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="11"]').click()  # N-Eを選択
+            # 時間選択
+            start_time_element = driver.find_element_by_name('StartTime')
+            select_start_time = Select(start_time_element)
+            select_start_time.select_by_value(start_time)
+            end_time_element = driver.find_element_by_name('EndTime')
+            select_end_time = Select(end_time_element)
+            select_end_time.select_by_value(end_time)
+            # 目的選択
+            purpose = driver.find_element_by_name('PurposeCode')
+            select_purpose = Select(purpose)
+            select_purpose.select_by_value('1')
+            driver.find_element_by_name("NumberOfUsers").send_keys('10')
+            # 予約ボタン押下
+            driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+
+            # except NoSuchElementException:
+            #    print("属性が見つかりませんでした。")
+
+            # ダブルブッキングした場合
+            alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
+                    end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+
+        elif iter_date.weekday() == 2:  # 水曜日だったら以下を予約
+            """
+                         N-E　水曜　9:30-10:30を予約
+    
+            """
+            start_time = '9:30'  # ここを変える
+            end_time = '11:00'  # ここを変える
+            day_name = '(水)'
+            driver.find_element_by_link_text(str(i)).click()  # 日付指定
+            driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="11"]').click()  # N-Eを選択
+            # 時間選択
+            start_time_element = driver.find_element_by_name('StartTime')
+            select_start_time = Select(start_time_element)
+            select_start_time.select_by_value(start_time)
+            end_time_element = driver.find_element_by_name('EndTime')
+            select_end_time = Select(end_time_element)
+            select_end_time.select_by_value(end_time)
+            # 目的選択
+            purpose = driver.find_element_by_name('PurposeCode')
+            select_purpose = Select(purpose)
+            select_purpose.select_by_value('1')
+            driver.find_element_by_name("NumberOfUsers").send_keys('10')
+            # 予約ボタン押下
+            driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+
+            # except NoSuchElementException:
+            #    print("属性が見つかりませんでした。")
+
+            # ダブルブッキングした場合
+            alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
+                    end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
 
 
+        elif iter_date.weekday() == 3:  # 木曜だったら以下を予約
+            """
+                        N-E　木　9:30-10:30を予約
+            """
+            start_time = '9:30'  # ここを変える
+            end_time = '11:00'  # ここを変える
+            day_name = '(木)'
+            driver.find_element_by_link_text(str(i)).click()  # 日付指定
+            driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="11"]').click()  # N-Eを選択
+            # 時間選択
+            start_time_element = driver.find_element_by_name('StartTime')
+            select_start_time = Select(start_time_element)
+            select_start_time.select_by_value(start_time)
+            end_time_element = driver.find_element_by_name('EndTime')
+            select_end_time = Select(end_time_element)
+            select_end_time.select_by_value(end_time)
+            # 目的選択
+            purpose = driver.find_element_by_name('PurposeCode')
+            select_purpose = Select(purpose)
+            select_purpose.select_by_value('1')
+            driver.find_element_by_name("NumberOfUsers").send_keys('10')
+            # 予約ボタン押下
+            driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+
+            # except NoSuchElementException:
+            #    print("属性が見つかりませんでした。")
+
+            # ダブルブッキングした場合
+            alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
+                    end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+
+        elif iter_date.weekday() == 4:  # 金曜だったら以下を予約
+            """
+                        N-E　金　9:30-10:30を予約
+            """
+            start_time = '9:30'  # ここを変える
+            end_time = '11:00'  # ここを変える
+            day_name = '(金)'
+            driver.find_element_by_link_text(str(i)).click()  # 日付指定
+            driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="11"]').click()  # N-Eを選択
+            # 時間選択
+            start_time_element = driver.find_element_by_name('StartTime')
+            select_start_time = Select(start_time_element)
+            select_start_time.select_by_value(start_time)
+            end_time_element = driver.find_element_by_name('EndTime')
+            select_end_time = Select(end_time_element)
+            select_end_time.select_by_value(end_time)
+            # 目的選択
+            purpose = driver.find_element_by_name('PurposeCode')
+            select_purpose = Select(purpose)
+            select_purpose.select_by_value('1')
+            driver.find_element_by_name("NumberOfUsers").send_keys('10')
+            # 予約ボタン押下
+            driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+
+            # except NoSuchElementException:
+            #    print("属性が見つかりませんでした。")
+
+            # ダブルブッキングした場合
+            alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+            if alert_msg:
+                print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
+                    end_time) + ' is already booked.')
+                driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
 
 
-
-
-
-
-
-
+my_mtg()
+oms_mtg()
