@@ -1,5 +1,5 @@
 #! python3
-
+# -*- coding:utf-8 -*-
 from selenium import webdriver
 import selenium
 from selenium.webdriver.support.ui import Select
@@ -18,14 +18,28 @@ from dateutil.relativedelta import relativedelta
 import calendar
 import jholiday
 
+#IE用ドライバー
 driver = webdriver.Ie('C:/Users/U621625/PycharmProjects/Work/selenium/webdriver/IEDriverServer.exe')
 
+"""
+会議室を取る日にちを決める
+"""
+
+#何ヶ月後を予約するかを指定　例）１ヶ月先は１、２ヶ月先は２
+target_month = 2
+
+today = datetime.date.today()  # datetimeから今日の日付を取得
+get_month = today + relativedelta(months=target_month)
+
+
+"""
+ブラウザ操作開始
+"""
 #ログイン画面開く
 url='https://gg2.groupwide.net/iMRRoomBooking/'
-
 driver.get(url)
 
-#ログイン情報記入
+#ログイン情報
 login_id = 'u621625'
 com_id = 'nttdata'
 password = 'zipzinger29'
@@ -33,32 +47,25 @@ password = 'zipzinger29'
 """
 LOGIN
 """
-driver.find_element_by_name("id1").send_keys(login_id) #idボックスのを探し入力
-driver.find_element_by_name("id2").send_keys(com_id) #会社識別子ボックスを探し入力
-driver.find_element_by_name("password").send_keys(password) #パスワードボックスを探し入力
-driver.find_element_by_xpath("//input[@title='Login'][@type='submit']").click() #Loginボタン押下
-driver.implicitly_wait(10)
+def login():
+    driver.find_element_by_name("id1").send_keys(login_id) #idボックスのを探し入力
+    driver.find_element_by_name("id2").send_keys(com_id) #会社識別子ボックスを探し入力
+    driver.find_element_by_name("password").send_keys(password) #パスワードボックスを探し入力
+    driver.find_element_by_xpath("//input[@title='Login'][@type='submit']").click() #Loginボタン押下
+    driver.implicitly_wait(10)
+login()
 
-#何ヶ月後を予約するかを指定
-target_month = 2
 
-#2ヶ月先まで表示するには二回Nextボタン押す必要あり
+#指定月まで表示カレンダーを移動。2ヶ月先まで表示するには二回Nextボタン押す必要あり
 for i in range(target_month):
     driver.implicitly_wait(10)  # 見つからないときは、10秒まで待つ
     driver.find_element_by_link_text("Next").click() #Nextボタン押下
     time.sleep(3)
 
-"""
-会議室を取る日にちを決める
-"""
-today = datetime.date.today()  # datetimeから日付を取得
 
-get_month = today + relativedelta(months=target_month)
-
-
-def get_dates(target_month):
+def get_dates():
     """
-    最初の日と最後の日を調べる
+    月の最初の日と最後の日を調べる
 
     """
     # 会議室を取る月の初日を求める
@@ -67,9 +74,9 @@ def get_dates(target_month):
     last_date = first_date + relativedelta(months=1) + datetime.timedelta(days=-1)
 
     return first_date, last_date
+first, last = get_dates()
 
 
-first, last = get_dates(target_month)
 
 def my_mtg():
 
@@ -89,10 +96,12 @@ def my_mtg():
         """
         属性の値　data-timeline = "x" ←　以下から該当する数字をxに記入する
     
-        1: 応接室,　2: 大会議室,　3: SouthTerrace,　4: Core-A　6: 事業部長会議室　
-        7: N-A,　8: N-B, 9: N-C, 10: N-D, 11:N-E, 12: N-F 
+        1: 応接室,　2: 大会議室,　3: SouthTerrace,　4: Core-A　6: FR事業部長会議室　
+        7:流サ事業部長会議室　8: N-A,　9: N-B, 10: N-C, 11: N-D, 12:N-E, 
         13: S-A,　14: S-B, 15: S-C, 16: S-D, 17: S-E
         """
+
+        #祝日セット
         holiday_name = jholiday.holiday_name(date=iter_date)
 
         if holiday_name is None:
@@ -105,10 +114,11 @@ def my_mtg():
                 start_time = '11:00'
                 end_time = '12:00'
                 day_name = '(火)'
+
                 try:
                     driver.implicitly_wait(10)
                     driver.find_element_by_link_text(str(d)).click()  # 日付指定
-                    driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="2"]').click()  # 二行目(大会議室)を選択
+                    driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="12"]').click()  # 二行目(大会議室)を選択
                     # 時間選択
                     start_time_element = driver.find_element_by_name('StartTime')
                     select_start_time = Select(start_time_element)
@@ -129,17 +139,15 @@ def my_mtg():
                     alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
                     if alert_msg:
                         print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(
-                            end_time) + ' is already taken.')
+                            end_time) + ' は既に取られています')
                         driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
                         driver.implicitly_wait(10)
                     else:
                         print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(
-                            end_time) + ' is booked.')
+                            end_time) + ' は予約完了')
 
                 except selenium.common.exceptions.UnexpectedAlertPresentException:
-                    print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is holiday.')
-                except selenium.common.exceptions.UnexpectedAlertPresentException:
-                    print("エラーが発生しました。")
+                    print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' は祝日です')
                 except NoSuchElementException:
                     print("属性が見つかりませんでした。")
                 except ElementNotInteractableException:
@@ -151,6 +159,17 @@ def my_mtg():
                 
                 start_time = '14:00'
                 end_time = '15:00'
+                 if iter_date.weekday() == 0:
+                    day_name = '(月)'
+                elif iter_date.weekday() == 1:
+                    day_name = '(火)'
+                elif iter_date.weekday() == 2:
+                    day_name = '(水)'
+                elif iter_date.weekday() == 3:
+                    day_name = '(木)'
+                elif iter_date.weekday() == 4:
+                    day_name = '(金)'
+                    
                 driver.implicitly_wait(10)
                 try:
                     driver.find_element_by_link_text(str(d)).click()  # 日付指定
@@ -177,21 +196,18 @@ def my_mtg():
 
                     if alert_msg:
                         print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(
-                            end_time) + ' is already taken.')
+                            end_time) + ' は既に取られています')
                         driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
                         driver.implicitly_wait(10)
                     else:
                         print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(
-                            end_time) + ' is booked.')
+                            end_time) + ' は予約完了')
 
                 except selenium.common.exceptions.UnexpectedAlertPresentException:
                      print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
-                    end_time) + ' is holiday.')
-                except selenium.common.exceptions.UnexpectedAlertPresentException:
-                    print("エラーが発生しました。")
+                    end_time) + ' は祝日です')
                 except NoSuchElementException:
                     print("属性が見つかりませんでした。")
-            
                 except ElementNotInteractableException:
                     print("クリックできませんでした。")
                 """
@@ -229,17 +245,15 @@ def my_mtg():
                     alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
 
                     if alert_msg:
-                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(end_time) + ' is already taken.')
+                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(end_time) + ' は既に取られています')
                         driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
                         driver.implicitly_wait(10)
                     else:
-                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(end_time) + ' is booked.')
+                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(end_time) + ' の予約完了')
 
                 except selenium.common.exceptions.UnexpectedAlertPresentException:
                     print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
-                        end_time) + ' is holiday.')
-                except selenium.common.exceptions.UnexpectedAlertPresentException:
-                    print("エラーが発生しました。")
+                        end_time) + ' は祝日です')
                 except NoSuchElementException:
                     print("属性が見つかりませんでした。")
                 except ElementNotInteractableException:
@@ -314,16 +328,15 @@ def oms_mtg():
                 alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
 
                 if alert_msg:
-                    print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(
-                        end_time) + ' is already taken.')
+                    print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(end_time) + ' は既に取られています')
                     driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
                     driver.implicitly_wait(10)
                 else:
-                    print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(end_time) + ' is booked.')
+                    print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(end_time) + ' の予約完了')
 
 
         except selenium.common.exceptions.UnexpectedAlertPresentException:
-            print("エラーが発生しました。")
+            print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' は祝日です')
         except NoSuchElementException:
             print("属性が見つかりませんでした。")
         except ElementNotInteractableException:
@@ -332,4 +345,4 @@ def oms_mtg():
 
 if __name__ == '__main__':
     my_mtg()
-    oms_mtg()
+    #oms_mtg()
