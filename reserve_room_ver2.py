@@ -105,64 +105,96 @@ def my_mtg():
                 start_time = '11:00'
                 end_time = '12:00'
                 day_name = '(火)'
-                driver.implicitly_wait(10)
-                driver.find_element_by_link_text(str(d)).click()  # 日付指定
-                driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="12"]').click()  # 二行目(大会議室)を選択
-                # 時間選択
-                start_time_element = driver.find_element_by_name('StartTime')
-                select_start_time = Select(start_time_element)
-                select_start_time.select_by_value(start_time)
-                end_time_element = driver.find_element_by_name('EndTime')
-                select_end_time = Select(end_time_element)
-                select_end_time.select_by_value(end_time)
-                # 目的選択
-                purpose = driver.find_element_by_name('PurposeCode')
-                select_purpose = Select(purpose)
-                select_purpose.select_by_value('1')
-                driver.find_element_by_name("NumberOfUsers").send_keys('10')
-                # 予約ボタン押下
-                driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+                try:
+                    driver.implicitly_wait(10)
+                    driver.find_element_by_link_text(str(d)).click()  # 日付指定
+                    driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="2"]').click()  # 二行目(大会議室)を選択
+                    # 時間選択
+                    start_time_element = driver.find_element_by_name('StartTime')
+                    select_start_time = Select(start_time_element)
+                    select_start_time.select_by_value(start_time)
+                    end_time_element = driver.find_element_by_name('EndTime')
+                    select_end_time = Select(end_time_element)
+                    select_end_time.select_by_value(end_time)
+                    # 目的選択
+                    purpose = driver.find_element_by_name('PurposeCode')
+                    select_purpose = Select(purpose)
+                    select_purpose.select_by_value('1')
+                    driver.find_element_by_name("NumberOfUsers").send_keys('10')
+                    # 予約ボタン押下
+                    driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+                    driver.implicitly_wait(10)
 
-                #except NoSuchElementException:
-                #    print("属性が見つかりませんでした。")
+                    # ダブルブッキングした場合
+                    alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+                    if alert_msg:
+                        print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(
+                            end_time) + ' is already taken.')
+                        driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+                        driver.implicitly_wait(10)
+                    else:
+                        print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(
+                            end_time) + ' is booked.')
 
-                #ダブルブッキングした場合
-                alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
-                if alert_msg:
-                    print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
-                    driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+                except selenium.common.exceptions.UnexpectedAlertPresentException:
+                    print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is holiday.')
+                except selenium.common.exceptions.UnexpectedAlertPresentException:
+                    print("エラーが発生しました。")
+                except NoSuchElementException:
+                    print("属性が見つかりませんでした。")
+                except ElementNotInteractableException:
+                    print("クリックできませんでした。")
 
 
                 """
-                            大会議室　火曜　14:00-15:00を予約
-                """
+                            　火曜　14:00-15:00を予約
+                
                 start_time = '14:00'
                 end_time = '15:00'
                 driver.implicitly_wait(10)
-                driver.find_element_by_link_text(str(d)).click()  # 日付指定
-                driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="12"]').click()  # N-Fを選択
-                start_time_element = driver.find_element_by_name('StartTime')
-                select_start_time = Select(start_time_element)
-                select_start_time.select_by_value(start_time)
-                end_time_element = driver.find_element_by_name('EndTime')
-                select_end_time = Select(end_time_element)
-                select_end_time.select_by_value(end_time)
+                try:
+                    driver.find_element_by_link_text(str(d)).click()  # 日付指定
+                    driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="12"]').click()  # N-Fを選択
+                    start_time_element = driver.find_element_by_name('StartTime')
+                    select_start_time = Select(start_time_element)
+                    select_start_time.select_by_value(start_time)
+                    end_time_element = driver.find_element_by_name('EndTime')
+                    select_end_time = Select(end_time_element)
+                    select_end_time.select_by_value(end_time)
+    
+                    #目的選択
+                    purpose = driver.find_element_by_name('PurposeCode')
+                    select_purpose = Select(purpose)
+                    select_purpose.select_by_value('1')
+                    driver.find_element_by_name("NumberOfUsers").send_keys('10')
+                    
+                    # 予約ボタン押下
+                    driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+                    driver.implicitly_wait(10)
+                    
+                    # ダブルブッキングした場合
+                    alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
 
-                #目的選択
-                purpose = driver.find_element_by_name('PurposeCode')
-                select_purpose = Select(purpose)
-                select_purpose.select_by_value('1')
+                    if alert_msg:
+                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(
+                            end_time) + ' is already taken.')
+                        driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+                        driver.implicitly_wait(10)
+                    else:
+                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(
+                            end_time) + ' is booked.')
 
-                driver.find_element_by_name("NumberOfUsers").send_keys('10')
-                #driver.find_element_by_class_name("btnbluesubmit-form-new").click()
-                # 予約ボタン押下
-                driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
-
-                # ダブルブッキングした場合
-                if alert_msg:
-                    print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
-                    driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
-
+                except selenium.common.exceptions.UnexpectedAlertPresentException:
+                     print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
+                    end_time) + ' is holiday.')
+                except selenium.common.exceptions.UnexpectedAlertPresentException:
+                    print("エラーが発生しました。")
+                except NoSuchElementException:
+                    print("属性が見つかりませんでした。")
+            
+                except ElementNotInteractableException:
+                    print("クリックできませんでした。")
+                """
 
             elif iter_date.weekday() == 3: # 木曜だったら以下を予約
                 """
@@ -191,15 +223,27 @@ def my_mtg():
                     driver.find_element_by_name("NumberOfUsers").send_keys('10')
                     # 予約ボタン押下
                     driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
+                    driver.implicitly_wait(10)
+
+                    # ダブルブッキングした場合
+                    alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+
+                    if alert_msg:
+                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(end_time) + ' is already taken.')
+                        driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+                        driver.implicitly_wait(10)
+                    else:
+                        print(str(iter_date) + " " + day_name + " " + 'SouthTerrace ' + str(start_time) + '-' + str(end_time) + ' is booked.')
 
                 except selenium.common.exceptions.UnexpectedAlertPresentException:
                     print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(
                         end_time) + ' is holiday.')
-
-                # ダブルブッキングした場合
-                if alert_msg:
-                    print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
-                    driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+                except selenium.common.exceptions.UnexpectedAlertPresentException:
+                    print("エラーが発生しました。")
+                except NoSuchElementException:
+                    print("属性が見つかりませんでした。")
+                except ElementNotInteractableException:
+                    print("クリックできませんでした。")
 
 
 def oms_mtg():
@@ -247,10 +291,9 @@ def oms_mtg():
                     day_name = '(金)'
 
 
-
                 driver.find_element_by_link_text(str(d)).click()
                 driver.implicitly_wait(10)
-                driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="12"]').click()  # 大会議室を選択 ここを変える
+                driver.find_element_by_xpath('//div[@class="tl ui-selectee"][@data-timeline="2"]').click()  # 大会議室を選択 ここを変える
                 # 時間選択
                 start_time_element = driver.find_element_by_name('StartTime')
                 select_start_time = Select(start_time_element)
@@ -267,29 +310,26 @@ def oms_mtg():
                 driver.find_element_by_xpath('//button[@class="btn blue submit-form-new"][@type="button"]').click()
                 driver.implicitly_wait(10)
 
+                # ダブルブッキングした場合
+                alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
+
+                if alert_msg:
+                    print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(
+                        end_time) + ' is already taken.')
+                    driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
+                    driver.implicitly_wait(10)
+                else:
+                    print(str(iter_date) + " " + day_name + " " + '大会議室 ' + str(start_time) + '-' + str(end_time) + ' is booked.')
+
+
         except selenium.common.exceptions.UnexpectedAlertPresentException:
             print("エラーが発生しました。")
         except NoSuchElementException:
             print("属性が見つかりませんでした。")
+        except ElementNotInteractableException:
+            print("クリックできませんでした。")
 
 
-            # ダブルブッキングした場合
-            alert_msg = driver.find_element_by_xpath('//section[@class="alert error active"]')
-            try:
-                if alert_msg:
-                    print(str(iter_date) + " " + day_name + " " + str(start_time) + '-' + str(end_time) + ' is already booked.')
-                    driver.find_element_by_xpath('//div[@class="btnCircle close"][@id="close-entry"]').click()
-                    driver.implicitly_wait(10)
-            except ElementNotInteractableException:
-                print("クリックできませんでした。")
-            except NoSuchElementException:
-                print("属性が見つかりませんでした。")
-"""""
-"""""
-#my_mtg()
-oms_mtg()
-
-
-
-
-
+if __name__ == '__main__':
+    my_mtg()
+    oms_mtg()
