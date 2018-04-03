@@ -40,9 +40,9 @@ url='https://gg2.groupwide.net/iMRRoomBooking/'
 driver.get(url)
 
 #ログイン情報
-login_id = 'u621625'
-com_id = 'nttdata'
-password = 'zipzinger29'
+login_id = ''
+com_id = ''
+password = ''
 
 """
 LOGIN
