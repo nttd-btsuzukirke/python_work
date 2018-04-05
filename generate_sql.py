@@ -50,7 +50,7 @@ before_order = {
 
 after_order = {'決済情報': 'payment.t_commerce_payment', '決済情報_adyen': 'payment.t_commerce_payment_adyen', }
 
-print('1.After Cart Generated\n2.After Tempo Booked\n3.Before Order Taking\n4.After Order Taking')
+print('1.After Cart Generated\n2.After Tempo Booked\n3.Before Order Taking\n4.After Order Taking\n5.Above All')
 condition = input()
 
 if not condition == '4':
@@ -62,6 +62,7 @@ contents = ''
 
 
 def after_cart_generated(contents, file_name):
+
     for b in cart_generate_basket.values():
 
         contents += 'SELECT * FROM ' + b + ' WHERE basket_no = ' + "'" + basket_no + "'" + ';\n'
@@ -159,5 +160,43 @@ elif condition == '4':
     file_name = 'payment.sql'
     create_file.write_contents(contents, file_path, file_name)
 
+elif condition == '5':
+    after_cart_generated(contents, file_name)
+    """
+           仮引き当て後
+        """
+
+    after_cart_generated(contents, file_name='after_temporary_booking.sql')
+
+    after_temporary_bookig(contents, file_name='after_temporary_booking.sql')
+    """
+        注文受付前
+        """
+
+    after_cart_generated(contents, file_name='before_order_taking.sql')
+
+    after_temporary_bookig(contents, file_name='before_order_taking.sql')
+
+    before_order_taking(contents, file_name='before_order_taking.sql')
+
+    """
+        注文受付後
+
+        """
+
+    payment_id = ''
+
+    payment_info = 'SELECT * FROM ' + after_order[
+        '決済情報'] + ' WHERE payment_id = ' + "'" + payment_id + "'" + ';\n'
+    contents += payment_info
+
+    payment_info_adyen = 'SELECT * FROM ' + after_order[
+        '決済情報_adyen'] + ' WHERE payment_id = ' + "'" + payment_id + "'" + ';\n'
+    contents += payment_info_adyen
+
+    file_name = 'payment.sql'
+    create_file.write_contents(contents, file_path, file_name)
+
 else:
     print('Input is wrong')
+
