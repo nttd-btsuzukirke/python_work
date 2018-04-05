@@ -3,6 +3,7 @@
 
 import create_file
 import os
+
 file_path = 'C:/Users/nttdata/Desktop/SQL/test/'
 
 file_name = 'after_cart_generated.sql'
@@ -47,24 +48,32 @@ before_order = {
     '住所マスタ': 'core.m_address'
 }
 
+after_order = {'決済情報': 'payment.t_commerce_payment', '決済情報_adyen': 'paymkent.t_commerce_payment_adyen', }
 
-cart_no = input('cart_no: ')
+
+
+
+
 
 condition = input('1.After Cart Generated\n2.After Tempo Booked\n3.Before Order Taking\n4.After Order Taking\n→ ')
 
+if not condition == '4':
+    basket_no = input('basket_no: ')
+else:
+    pass
 
 def after_cart_generated():
 
     for i in cart_generate_basket.values():
-        basket_sql = ''
-        basket_sql += 'SELECT * FROM ' + i + ' WHERE basket_no = ' + "'" + cart_no + "'" + ';'
+        contents = ""
+        contents += 'SELECT * FROM ' + i + ' WHERE basket_no = ' + "'" + basket_no + "'" + ';'
 
         #for line in basket_sql:
          #   with open(file_name, 'a') as file_object:  # ファイルまでのフルパス
                 # 記入
           #      file_object.write(line)
-    print(basket_sql)
-
+        print(contents)
+        create_file.write_texts(contents, file_path, file_name)
     # 在庫
     contents = ''
     stock_id = '90001203'
@@ -115,13 +124,13 @@ elif condition == '3':
     """
     for i in cart_generate_basket.values():
         basket_sql = ''
-        basket_sql += 'SELECT * FROM ' + i + ' WHERE basket_no = ' + "'" + cart_no + "'" + ';'
+        basket_sql += 'SELECT * FROM ' + i + ' WHERE basket_no = ' + "'" + basket_no + "'" + ';'
         print(basket_sql)
 
     #　仮引当
     for t in temporary_booking.values():
         contents = ''
-        temporary_booking_sql = 'SELECT * FROM ' + t + ' WHERE basket_no = ' + "'" + cart_no + "'" + ';' + '\n'
+        temporary_booking_sql = 'SELECT * FROM ' + t + ' WHERE basket_no = ' + "'" + basket_no + "'" + ';' + '\n'
         #contents += temporary_booking_sql
         print(temporary_booking_sql)
 
@@ -168,5 +177,17 @@ elif condition == '4':
     注文受付後
     
     """
-    after_order = {'決済情報': 'payment.t_commerce_payment', '決済情報_adyen': 'paymkent.t_commerce_payment_adyen', }
+
     payment_id = ''
+
+    payment_info = 'SELECT * FROM ' + after_order[
+        '決済情報'] + ' WHERE payment_id = ' + "'" + payment_id + "'" + ';\n'
+    # contents += payment_info
+
+    payment_info_adyen = 'SELECT * FROM ' + after_order[
+        '決済情報_adyen'] + ' WHERE payment_id = ' + "'" + payment_id + "'" + ';\n'
+    # contents += inventory_sql_l3_quantity
+    print(payment_info + payment_info)
+
+else:
+    print('input is wrong')
